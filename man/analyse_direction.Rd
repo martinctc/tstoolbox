@@ -7,5 +7,6 @@
 analyse_direction(x, var1, var2)
 }
 \description{
+This returns the total number and proportion of pairwise co-movement in two time series variables.
 An explanatory note is printed as a message in the console.
 }

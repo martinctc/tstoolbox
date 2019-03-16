@@ -1,5 +1,6 @@
 #' Analyse co-movement between two numeric variables.
 #'
+#' This returns the total number and proportion of pairwise co-movement in two time series variables.
 #' An explanatory note is printed as a message in the console.
 #'
 #'@export
