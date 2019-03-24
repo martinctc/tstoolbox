@@ -2,5 +2,5 @@
 
 export(analyse_direction)
 export(direction)
-export(maxmin_line)
 export(plot_xcf)
+export(stend_line)
