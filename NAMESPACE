@@ -2,5 +2,6 @@
 
 export(analyse_direction)
 export(direction)
+export(pc_change)
 export(plot_xcf)
 export(stend_line)
