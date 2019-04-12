@@ -7,6 +7,8 @@ This package includes functions for:
 * Direction Analysis - What is the proportion of data points where two time series move in the same direction?
 * Cross-correlation analysis
 
+The functions in this package can work as supplementary tools to validate or support hypotheses which come out of time series modelling. They can also work as early diagnostic / exploratory tools pre-modelling.
+
 ---
 
 ### Installation
