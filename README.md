@@ -27,3 +27,5 @@ This package is currently still under development, so it does come with a health
 ### Contact me
 ---
 Please feel free to submit suggestions and report bugs: <https://github.com/martinctc/tstoolbox/issues>
+
+Also check out my [website](https://martinctc.github.io) for my other work and packages.
