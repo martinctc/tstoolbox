@@ -7,5 +7,5 @@
 plot_xcf(df, x, y, title = "Cross Correlation")
 }
 \description{
-Create a pretty cross-correlation plot
+Returns a ggplot object
 }

@@ -1,5 +1,7 @@
 #' Create a pretty cross-correlation plot
 #'
+#' Returns a ggplot object
+#'
 #' @export
 plot_xcf <- function(df, x, y, title="Cross Correlation"){
   df_x <- eval(substitute(x),df)
