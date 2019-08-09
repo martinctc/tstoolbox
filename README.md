@@ -24,6 +24,14 @@ devtools::install_github("martinctc/tstoolbox")
 
 This package is currently still under development, so it does come with a health advice: if you do wish to use them - have a check and run through the examples before assimilating them into your analysis. 
 
+---
+### Function Overview
+
+- `analyse_direction()` analyses co-movement between two numeric variables, returning a diagnostic explanation.
+- `return_k_date()` returns the _kth_ most recent or oldest date-time from a date-time vector.
+(More to come!)
+
+---
 ### Contact me
 ---
 Please feel free to submit suggestions and report bugs: <https://github.com/martinctc/tstoolbox/issues>
