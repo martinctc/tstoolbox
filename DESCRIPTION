@@ -8,5 +8,5 @@ Description: Useful tools for time series analysis.
 License: What license is it under?
 Encoding: UTF-8
 LazyData: true
-Imports: base, dplyr, ggplot2, ggthemes, stats, rlang
+Imports: base, dplyr, ggplot2, ggthemes, stats, rlang, lubridate, Rfast
 RoxygenNote: 6.1.1
