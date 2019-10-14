@@ -4,6 +4,7 @@
 #'
 #' @export
 plot_xcf <- function(df, x, y, title="Cross Correlation"){
+
   df_x <- eval(substitute(x),df)
   df_y <- eval(substitute(y),df)
   ccf.object <- ccf(df_x,df_y,plot=FALSE)
