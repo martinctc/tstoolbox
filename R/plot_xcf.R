@@ -18,7 +18,7 @@ plot_xcf <- function(df, x, y, title="Cross Correlation"){
     geom_bar(stat="identity",aes(fill=cat))+
     scale_fill_manual(values=c("#339933","#cc0000"))+
     ylab("Cross correlation")+
-    scale_y_continuous(limits=c(-0.5,0.5))+
+    scale_y_continuous(limits=c(-1, 1))+
     ggthemes::theme_economist()+
     theme(legend.position = "none", plot.title=element_text(size=10))+
     ggtitle(title)
