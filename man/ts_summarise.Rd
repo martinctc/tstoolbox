@@ -4,8 +4,7 @@
 \alias{ts_summarise}
 \title{Group-summarise a time series}
 \usage{
-ts_summarise(x, grouping = "year", date_var = "Date", fun = "sum",
-  ...)
+ts_summarise(x, grouping = "year", date_var = "Date", fun = "sum", ...)
 }
 \arguments{
 \item{x}{Data frame to be passed through}

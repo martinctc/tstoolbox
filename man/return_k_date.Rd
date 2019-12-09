@@ -17,6 +17,7 @@ return_k_date(x, k, decreasing = TRUE)
 Return the k-th most recent or oldest date / datetime from a vector
 }
 \examples{
-dates <- c(ymd("2018-01-01"), ymd("2016-01-31"), ymd("2017-01-31")
-return_k_date(dates), k = 2)
+library(lubridate)
+dates <- c(ymd("2018-01-01"), ymd("2016-01-31"), ymd("2017-01-31"))
+return_k_date(dates, k = 2)
 }
