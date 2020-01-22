@@ -1,11 +1,13 @@
 # tstoolbox
 Useful tools for time series analysis
 
+This is a package built on functions that I've created in time-series analysis that I have produced in the past. Like many packages, not all of this would be 100% original work - some of them would be built upon the work of others, or are convenient wrappers around functions from other packages that perform more of the heavy-lifting work. I hope you would find this package useful!
+
 ---
 
 This package includes functions for:
 * Direction Analysis - What is the proportion of data points where two time series move in the same direction?
-* Cross-correlation analysis
+* Cross-correlation analysis - exploring lagged correlations
 * Calculating adstock (and "reverse" calculate the pre-transformed values using adstocked values)
 
 The functions in this package can work as supplementary tools to validate or support hypotheses which come out of time series modelling. They can also work as early diagnostic / exploratory tools pre-modelling.
