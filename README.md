@@ -32,6 +32,7 @@ This package is currently still under development, so it does come with a health
 
 - `analyse_direction()` analyses co-movement between two numeric variables, returning a diagnostic explanation.
 - `return_k_date()` returns the _kth_ most recent or oldest date-time from a date-time vector.
+- `plot_xcf()` generates a cross-correlation plot as a 'pretty' ggplot object.
 (More to come!)
 
 ---
