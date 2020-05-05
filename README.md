@@ -1,4 +1,7 @@
 # tstoolbox
+
+[![R build status](https://github.com/martinctc/tstoolbox/workflows/R-CMD-check/badge.svg)](https://github.com/martinctc/tstoolbox/actions)
+
 Useful tools for time series analysis
 
 This is a package built on functions that I've created in time-series analysis that I have produced in the past. Like many packages, not all of this would be 100% original work - some of them would be built upon the work of others, or are convenient wrappers around functions from other packages that perform more of the heavy-lifting work. I hope you would find this package useful!
