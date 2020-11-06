@@ -1,6 +1,6 @@
 # tstoolbox
 
-[![R build status](https://github.com/martinctc/tstoolbox/workflows/R-CMD-check/badge.svg)](https://github.com/martinctc/tstoolbox/actions)
+[![R build status](https://github.com/martinctc/tstoolbox/workflows/R-CMD-check/badge.svg)](https://github.com/martinctc/tstoolbox/actions) [![CodeFactor](https://www.codefactor.io/repository/github/martinctc/tstoolbox/badge)](https://www.codefactor.io/repository/github/martinctc/tstoolbox)
 
 Useful tools for time series analysis
 
