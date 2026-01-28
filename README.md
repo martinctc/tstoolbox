@@ -19,7 +19,7 @@ The functions in this package can work as supplementary tools to validate or sup
 
 ### Installation
 
-surveytoolbox is not release on CRAN (yet). 
+tstoolbox is not released on CRAN (yet). 
 You can install the latest development version from GitHub with:
 
 ```
