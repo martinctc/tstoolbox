@@ -2,11 +2,30 @@
 % Please edit documentation in R/analyse_direction.R
 \name{analyse_direction}
 \alias{analyse_direction}
-\title{Analyse co-movement between two numeric variables.}
+\title{Analyse co-movement between two numeric variables}
 \usage{
 analyse_direction(x, var1, var2)
 }
+\arguments{
+\item{x}{A data frame containing the time series variables.}
+
+\item{var1}{Unquoted name of the first numeric variable.}
+
+\item{var2}{Unquoted name of the second numeric variable.}
+}
+\value{
+A tibble with three columns: `n` (number of matching directions),
+  `base` (total number of observations), and `prop` (proportion of matches).
+}
 \description{
-This returns the total number and proportion of pairwise co-movement in two time series variables.
-An explanatory note is printed as a message in the console.
+This returns the total number and proportion of pairwise co-movement in two
+time series variables. An explanatory note is printed as a message in the console.
+}
+\examples{
+df <- data.frame(
+  series1 = c(1, 3, 2, 5, 4),
+  series2 = c(2, 4, 3, 6, 5)
+)
+analyse_direction(df, series1, series2)
+
 }

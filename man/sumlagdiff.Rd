@@ -3,14 +3,17 @@
 \name{sumlagdiff}
 \alias{sumlagdiff}
 \title{Create a score that measures the absolute fluctuation
-for a numeric vector}
+  for a numeric vector}
 \usage{
 sumlagdiff(x, na.rm = FALSE)
 }
 \arguments{
-\item{x}{numeric}
+\item{x}{A numeric vector.}
 
-\item{na.rm}{logical. Should missing values (including NaN) be removed?}
+\item{na.rm}{Logical. Should missing values (including `NaN`) be removed?}
+}
+\value{
+A single numeric value representing the sum of absolute differences.
 }
 \description{
 Returns the sum of absolute differences for each

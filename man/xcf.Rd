@@ -7,10 +7,25 @@
 xcf(df, x, y)
 }
 \arguments{
-\item{x}{Numeric vector to pass through}
+\item{df}{A data frame containing the time series variables.}
 
-\item{y}{Numeric vector to pass through}
+\item{x}{Unquoted name of the first numeric variable.}
+
+\item{y}{Unquoted name of the second numeric variable.}
+}
+\value{
+A tibble with two columns: `lag` (the lag value) and `x.corr`
+  (the cross-correlation at that lag).
 }
 \description{
-Returns the values of the cross-correlation correlation
+Returns the values of the cross-correlation between two time series
+variables as a tibble.
+}
+\examples{
+df <- data.frame(
+  x = rnorm(100),
+  y = rnorm(100)
+)
+xcf(df, x, y)
+
 }

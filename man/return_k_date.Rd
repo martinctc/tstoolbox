@@ -7,11 +7,15 @@
 return_k_date(x, k, decreasing = TRUE)
 }
 \arguments{
-\item{x}{A vector of date-time}
+\item{x}{A vector of date-time values.}
 
-\item{k}{Integer specifying the k-th value to return from the vector}
+\item{k}{Integer specifying the k-th value to return from the vector.}
 
-\item{decreasing}{Logical. Specifies whether to return most recent or oldest}
+\item{decreasing}{Logical. If `TRUE` (default), returns the k-th most recent
+date. If `FALSE`, returns the k-th oldest date.}
+}
+\value{
+A single datetime value representing the k-th date.
 }
 \description{
 Return the k-th most recent or oldest date / datetime from a vector
@@ -20,4 +24,5 @@ Return the k-th most recent or oldest date / datetime from a vector
 library(lubridate)
 dates <- c(ymd("2018-01-01"), ymd("2016-01-31"), ymd("2017-01-31"))
 return_k_date(dates, k = 2)
+
 }

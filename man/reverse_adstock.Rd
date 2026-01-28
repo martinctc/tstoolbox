@@ -7,10 +7,22 @@
 reverse_adstock(x, rate = 0)
 }
 \arguments{
-\item{x}{Numeric vector to be passed through}
+\item{x}{Numeric vector to be passed through (adstocked values).}
 
-\item{rate}{Adstock rate to be used (must be a positive value)}
+\item{rate}{Adstock rate to be used (must be a positive value between 0 and 1).}
+}
+\value{
+A numeric vector of the same length as `x` with the adstock
+  transformation reversed.
 }
 \description{
-Convert adstocked values back to original values
+Reverses an adstock transformation to recover the original values
+from adstocked data.
+}
+\examples{
+# Apply adstock then reverse it
+original <- c(100, 200, 300, 150, 200)
+adstocked <- adstock(original, rate = 0.2)
+reverse_adstock(adstocked, rate = 0.2)
+
 }

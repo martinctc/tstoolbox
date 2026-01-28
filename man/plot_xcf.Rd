@@ -6,6 +6,28 @@
 \usage{
 plot_xcf(df, x, y, title = "Cross Correlation")
 }
+\arguments{
+\item{df}{A data frame containing the time series variables.}
+
+\item{x}{Unquoted name of the first numeric variable.}
+
+\item{y}{Unquoted name of the second numeric variable.}
+
+\item{title}{Character string specifying the plot title.
+Defaults to "Cross Correlation".}
+}
+\value{
+A ggplot object displaying the cross-correlation plot.
+}
 \description{
-Returns a ggplot object
+Generates a cross-correlation plot as a ggplot object with color-coded
+bars indicating positive and negative correlations.
+}
+\examples{
+df <- data.frame(
+  x = rnorm(100),
+  y = rnorm(100)
+)
+plot_xcf(df, x, y)
+
 }
