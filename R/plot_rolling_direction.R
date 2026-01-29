@@ -42,6 +42,7 @@
 #'
 #' @importFrom ggplot2 ggplot aes geom_line geom_hline geom_ribbon
 #'   scale_y_continuous labs theme_minimal theme element_text annotate
+#' @importFrom scales percent_format
 #' @export
 plot_rolling_direction <- function(x, y, 
                                    window = 12, 
