@@ -1,0 +1,375 @@
+---
+title: "Introduction to Co-movement Analysis"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to Co-movement Analysis}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+
+collapse = TRUE,
+comment = "#>",
+fig.width = 7,
+fig.height = 4
+)
+```
+
+```{r setup}
+library(tstoolbox)
+library(ggplot2)
+```
+## What is Co-movement Analysis?
+
+Co-movement analysis examines how two time series move together over time. Unlike correlation (which measures linear association), **directional co-movement** asks a simpler question:
+
+> *"What proportion of the time do these series move in the same direction?"*
+
+This is particularly useful when:
+
+- You care about direction more than magnitude (e.g., "Did both stocks go up?")
+- Series have different scales or volatilities
+- You want an intuitive, interpretable measure
+- You need to detect changing relationships over time
+
+## The Dataset: European Stock Markets
+
+We'll use the `EuStockMarkets` dataset that comes with R, containing daily closing prices of four European stock indices from 1991-1998:
+
+- **DAX** (Germany)
+- **SMI** (Switzerland)
+- **CAC** (France)
+- **FTSE** (UK)
+
+```{r data-prep}
+# Convert to data frame
+stocks <- as.data.frame(EuStockMarkets)
+
+# Create a date sequence (EuStockMarkets is daily data from 1991-1998)
+# The time() function returns decimal years, so we convert appropriately
+time_vals <- time(EuStockMarkets)
+stocks$date <- as.Date("1991-01-01") + (time_vals - 1991) * 365.25
+
+head(stocks)
+```
+
+## Basic Direction Analysis
+
+### Understanding Direction
+
+The `direction()` function converts a numeric series into directional changes:
+
+```{r direction-basic}
+# Simple example
+prices <- c(100, 105, 103, 108, 108, 110)
+direction(prices)
+```
+
+Each value shows whether the series went up ("Positive"), down ("Negative"), or stayed flat ("Equal") compared to the previous observation.
+
+### Analysing Co-movement Between Two Series
+
+Do German (DAX) and French (CAC) markets move together? Use `analyse_direction()`:
+```{r analyse-direction}
+analyse_direction(stocks, DAX, CAC)
+```
+
+The output tells us:
+
+- The number of days where both indices moved in the same direction
+- The proportion (as a percentage)
+- This is returned as a tibble for further analysis
+
+Let's compare all pairs:
+
+```{r all-pairs}
+# DAX vs all others
+analyse_direction(stocks, DAX, SMI)
+analyse_direction(stocks, DAX, FTSE)
+```
+
+**Interpretation**: European markets show strong co-movement (65-70%), which makes sense given economic integration.
+
+## Statistical Testing
+
+Is 70% co-movement statistically significant, or could it happen by chance?
+
+### The Binomial Test
+
+Under the null hypothesis of independence, two series have a 50% chance of moving in the same direction. We can test against this:
+
+```{r direction-test}
+result <- direction_test(stocks$DAX, stocks$CAC)
+print(result)
+```
+
+The extremely small p-value confirms that DAX-CAC co-movement is highly significant.
+
+### Alternative Testing Methods
+
+For robustness, you can use permutation or bootstrap tests:
+
+```{r alternative-tests, eval=FALSE}
+# Permutation test (shuffles one series to create null distribution
+direction_test(stocks$DAX, stocks$CAC, method = "permutation", n_sim = 1000)
+
+# Bootstrap test (resamples to estimate uncertainty)
+direction_test(stocks$DAX, stocks$CAC, method = "bootstrap", n_sim = 1000)
+```
+
+### One-Sided Tests
+
+Test specific hypotheses:
+
+```{r one-sided}
+# Do they move together MORE than chance?
+direction_test(stocks$DAX, stocks$CAC, alternative = "greater")
+```
+
+## Rolling Co-movement Analysis
+
+Markets don't have constant relationships. The 2008 financial crisis famously showed that "correlations go to 1 in a crisis." Let's see how co-movement changes over time.
+
+### Calculating Rolling Co-movement
+
+```{r rolling-basic}
+# 60-day rolling window
+rolling_prop <- rolling_direction(stocks$DAX, stocks$CAC, window = 60)
+
+# Add to data frame
+stocks$dax_cac_rolling <- rolling_prop
+
+# View summary
+summary(rolling_prop)
+```
+
+### Visualising Rolling Co-movement
+
+```{r plot-rolling}
+plot_rolling_direction(
+  stocks$DAX, 
+  stocks$CAC, 
+  window = 60,
+  time = stocks$date,
+  title = "DAX-CAC Rolling Co-movement"
+)
+```
+
+**Reading the plot**:
+
+- Values above 0.5 (green zone): Positive co-movement
+- Values below 0.5 (red zone): Inverse movement
+- The dashed line at 0.5 represents "chance" level
+
+### Window Size Considerations
+
+```{r window-comparison, fig.height=6}
+# Compare different windows
+windows <- c(20, 60, 120)
+
+par(mfrow = c(3, 1), mar = c(4, 4, 2, 1))
+for (w in windows) {
+  roll <- rolling_direction(stocks$DAX, stocks$CAC, window = w)
+  plot(stocks$date, roll, type = "l", 
+ ylim = c(0.3, 1),
+       main = paste("Window =", w, "days"),
+       xlab = "Date", ylab = "Co-movement")
+  abline(h = 0.5, lty = 2, col = "gray")
+}
+```
+
+- **Short windows** (20): More volatile, captures short-term regime changes
+- **Medium windows** (60): Good balance, ~3 months of trading
+- **Long windows** (120): Smoother, shows persistent trends
+
+## Lead-Lag Analysis
+
+Does one market lead another? Perhaps US markets (not in this dataset) lead European markets, or maybe Germany leads France?
+
+### Detecting Lead-Lag Relationships
+
+```{r leadlag-basic}
+# Does DAX lead or lag CAC?
+ll_result <- direction_leadlag(stocks$DAX, stocks$CAC, max_lag = 10)
+print(ll_result)
+```
+
+The `optimal_lag` tells us:
+
+- **Negative lag**: First series (x) leads
+- **Positive lag**: Second series (y) leads
+- **Zero**: Contemporaneous (same-day) relationship
+
+### Visualising Lead-Lag Structure
+
+```{r plot-leadlag}
+plot(ll_result)
+```
+
+The bar chart shows co-movement at each lag. The red dashed line marks the optimal lag.
+
+### Example: Creating a Known Lead-Lag
+
+Let's simulate data where x clearly leads y:
+
+```{r simulated-leadlag}
+set.seed(42)
+n <- 200
+x <- cumsum(rnorm(n))
+y <- dplyr::lag(x, 3) + rnorm(n, sd = 0.5)  
+# y follows x with 3-period lag
+
+result <- direction_leadlag(x, y, max_lag = 6)
+print(result)
+plot(result)
+```
+
+The analysis correctly identifies that x leads y by 3 periods.
+
+## Concordance Index
+
+The Harding-Pagan concordance index is a formal measure used in economics to quantify business cycle synchronisation.
+
+### Basic Usage
+
+```{r concordance-basic}
+conc <- concordance(stocks$DAX, stocks$CAC)
+print(conc)
+```
+
+**Key outputs**:
+
+- **Concordance**: Raw proportion of time in same state (like `analyse_direction`)
+- **Expected**: What we'd expect under independence
+- **Adjusted**: Transformed to [-1, 1] scale where 0 = independence
+
+### Interpreting Adjusted Concordance
+
+| Value | Interpretation |
+|-------|----------------|
+| 1 | Perfect positive co-movement |
+| 0 | Independence (no relationship) |
+| -1 | Perfect negative co-movement |
+
+```{r concordance-examples}
+# Strong positive co-movement
+concordance(stocks$DAX, stocks$CAC)$adjusted
+
+# What about inverse relationship?
+concordance(stocks$DAX, -stocks$CAC)$adjusted
+```
+
+## Asymmetric Co-movement
+
+Do markets co-move differently during bull vs bear markets? This is crucial for portfolio diversification — you want assets that diversify in *downturns*, not just overall.
+
+### Testing for Asymmetry
+
+```{r asymmetric-basic}
+asym <- asymmetric_direction(stocks$DAX, stocks$CAC)
+print(asym)
+```
+
+**Key outputs**:
+
+- **upturn**: Co-movement when reference series is rising
+- **downturn**: Co-movement when reference series is falling
+- **asymmetry**: Difference (upturn - downturn)
+- **p_value**: Is the asymmetry statistically significant?
+
+### Choosing the Reference Series
+
+The `reference` argument controls how upturns/downturns are defined:
+
+```{r asymmetric-reference}
+# Use DAX to define market regimes
+asymmetric_direction(stocks$DAX, stocks$CAC, reference = "x")
+
+# Use CAC to define market regimes
+asymmetric_direction(stocks$DAX, stocks$CAC, reference = "y")
+```
+
+### Simulating Asymmetric Co-movement
+
+```{r simulated-asymmetric}
+set.seed(123)
+n <- 500
+
+# x is our reference series
+x <- cumsum(rnorm(n))
+
+# y follows x tightly in downturns, loosely in upturns
+y <- numeric(n)
+y[1] <- 0
+for (i in 2:n) {
+  if (x[i] < x[i-1]) {
+    # Downturn: strong relationship
+    y[i] <- y[i-1] + (x[i] - x[i-1]) * 0.9 + rnorm(1, sd = 0.1)
+  } else {
+    # Upturn: weak relationship
+    y[i] <- y[i-1] + rnorm(1, sd = 1)
+  }
+}
+
+asymmetric_direction(x, y)
+```
+
+This correctly identifies that co-movement is stronger during downturns.
+
+## Complete Workflow Example
+
+Let's put it all together with a full analysis:
+
+```{r workflow, fig.height=8}
+# 1. Basic co-movement
+cat("=== Basic Co-movement ===\n")
+analyse_direction(stocks, DAX, SMI)
+
+# 2. Statistical significance
+cat("\n=== Statistical Test ===\n")
+test <- direction_test(stocks$DAX, stocks$SMI)
+print(test)
+
+# 3. Formal concordance measure
+cat("\n=== Concordance Index ===\n")
+conc <- concordance(stocks$DAX, stocks$SMI)
+cat("Adjusted concordance:", round(conc$adjusted, 3), "\n")
+
+# 4. Lead-lag structure
+cat("\n=== Lead-Lag Analysis ===\n")
+ll <- direction_leadlag(stocks$DAX, stocks$SMI, max_lag = 5)
+print(ll)
+
+# 5. Asymmetry
+cat("\n=== Asymmetric Co-movement ===\n")
+asym <- asymmetric_direction(stocks$DAX, stocks$SMI)
+cat("Upturn co-movement:", round(asym$upturn * 100, 1), "%\n")
+cat("Downturn co-movement:", round(asym$downturn * 100, 1), "%\n")
+
+# 6. Rolling analysis (visual)
+plot_rolling_direction(
+  stocks$DAX, stocks$SMI, 
+  window = 60, time = stocks$date,
+  title = "DAX-SMI: Rolling 60-Day Co-movement"
+)
+```
+
+## Summary
+
+| Function | Purpose | Key Output |
+|----------|---------|------------|
+| `direction()` | Convert series to directional changes | Character vector |
+| `analyse_direction()` | Basic co-movement proportion | Tibble with n, base, prop |
+| `direction_test()` | Statistical significance | p-value, confidence interval |
+| `rolling_direction()` | Time-varying co-movement | Numeric vector |
+| `plot_rolling_direction()` | Visualise rolling co-movement | ggplot object |
+| `direction_leadlag()` | Detect lead-lag relationships | Optimal lag, interpretation |
+| `concordance()` | Formal concordance index | Raw and adjusted measures |
+| `asymmetric_direction()` | Upturn vs downturn co-movement | Asymmetry measure, p-value |
+
+## Next Steps
+
+- See the "Additional Time Series Tools" vignette for cross-correlation, adstock transformations, and utility functions
+- Check function documentation with `?function_name` for detailed parameter descriptions
