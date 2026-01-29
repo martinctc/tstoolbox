@@ -12,6 +12,8 @@
 #'
 #' @importFrom rlang enquo `:=`
 #' @importFrom dplyr vars mutate_at mutate summarise
+#' @importFrom glue glue
+#' @importFrom tidyr drop_na
 #'
 #' @examples
 #' df <- data.frame(
