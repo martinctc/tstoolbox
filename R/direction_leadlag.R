@@ -123,6 +123,7 @@ print.direction_leadlag <- function(x, ...) {
 #' @export
 #' @importFrom ggplot2 ggplot aes geom_col geom_vline scale_fill_gradient2
 #'   labs theme_minimal
+#' @importFrom scales percent_format
 plot.direction_leadlag <- function(x, ...) {
   
   df <- x$lag_table
