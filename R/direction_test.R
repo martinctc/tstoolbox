@@ -11,7 +11,7 @@
 #'   "two.sided" (default), "greater", or "less".
 #' @param n_sim Number of simulations for permutation or bootstrap tests.
 #'   Defaults to 1000.
-#' @param conf_level Confidence level for the confidence interval. Defaults to 0.95
+#' @param conf_level Confidence level for the confidence interval. Defaults to 0.95.
 #'
 #' @return A list with class "direction_test" containing:
 #'   \item{statistic}{The observed co-movement proportion.}
