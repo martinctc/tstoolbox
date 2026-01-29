@@ -21,6 +21,7 @@ Imports:
     magrittr,
     Rfast,
     rlang,
+    scales,
     stats,
     tibble,
     tidyr
