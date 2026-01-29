@@ -16,6 +16,7 @@
 #' @importFrom dplyr mutate
 #' @importFrom ggplot2 ggplot aes geom_bar scale_fill_manual ylab
 #'   scale_y_continuous theme element_text ggtitle
+#' @importFrom ggthemes theme_economist
 #'
 #' @examples
 #' df <- data.frame(
