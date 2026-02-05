@@ -1,9 +1,20 @@
 #' Convert adstocked values back to original values
-#' 
 #'
-#' @param x Numeric vector to be passed through
-#' @param rate Adstock rate to be used (must be a positive value)
-#' 
+#' Reverses an adstock transformation to recover the original values
+#' from adstocked data.
+#'
+#' @param x Numeric vector to be passed through (adstocked values).
+#' @param rate Adstock rate to be used (must be a positive value between 0 and 1).
+#'
+#' @return A numeric vector of the same length as `x` with the adstock
+#'   transformation reversed.
+#'
+#' @examples
+#' # Apply adstock then reverse it
+#' original <- c(100, 200, 300, 150, 200)
+#' adstocked <- adstock(original, rate = 0.2)
+#' reverse_adstock(adstocked, rate = 0.2)
+#'
 #' @export
 reverse_adstock <- function(x, rate = 0){
   y <- x - rate * dplyr::lag(x)

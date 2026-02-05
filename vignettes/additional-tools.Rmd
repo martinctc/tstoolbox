@@ -1,0 +1,357 @@
+---
+title: "Additional Time Series Tools"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Additional Time Series Tools}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.width = 7,
+  fig.height = 4
+)
+```
+
+```{r setup}
+library(tstoolbox)
+library(ggplot2)
+```
+
+This vignette covers additional tools in **tstoolbox** beyond the core co-movement analysis functions:
+
+- **Cross-correlation analysis** — Explore lagged correlations between series
+- **Adstock transformations** — Apply and reverse advertising decay effects
+- **Time series utilities** — Helpful functions for common tasks
+
+## Cross-Correlation Analysis
+
+Cross-correlation measures the correlation between two series at various lags. This helps identify:
+
+- Whether series are related
+- The optimal lag for the relationship
+- Whether one series leads or follows another
+
+### Creating a Cross-Correlation Table
+
+```{r xcf-basic}
+# Use European stock data
+stocks <- as.data.frame(EuStockMarkets)
+
+# Cross-correlation between DAX and CAC
+xcf_result <- xcf(stocks, DAX, CAC)
+head(xcf_result, 10)
+```
+
+The output shows:
+
+- `lag`: The time offset (negative = DAX leads, positive = CAC leads)
+- `x.corr`: The cross-correlation at that lag
+
+### Visualising Cross-Correlation
+
+Base R's `ccf()` produces functional but plain plots. `plot_xcf()` creates publication-ready ggplot2 visualisations:
+
+```{r plot-xcf}
+plot_xcf(stocks, DAX, CAC, title = "DAX vs CAC Cross-Correlation")
+```
+
+**Reading the plot**:
+
+- Green bars: Positive correlation
+- Red bars: Negative correlation
+- The tallest bar indicates the lag with strongest relationship
+- Bars near lag 0 suggest contemporaneous relationship
+
+### Comparing Multiple Pairs
+
+```{r xcf-multiple, fig.height=6}
+par(mfrow = c(2, 2), mar = c(4, 4, 3, 1))
+
+# Quick base R comparisons
+for (idx in c("SMI", "CAC", "FTSE")) {
+  ccf(stocks$DAX, stocks[[idx]], main = paste("DAX vs", idx), lag.max = 20)
+}
+```
+
+## Adstock Transformations
+
+Adstock is a concept from marketing analytics that models the **carryover effect** of advertising. When you see an ad today, its effect doesn't disappear immediately — it decays over time.
+
+### The Adstock Formula
+
+$$\text{Adstock}_t = X_t + \lambda \cdot \text{Adstock}_{t-1}$$
+
+Where:
+
+- $X_t$ is the original value (e.g., ad spend)
+- $\lambda$ is the decay rate (0 to 1)
+- Higher $\lambda$ = longer-lasting effect
+
+### Applying Adstock
+
+```{r adstock-basic}
+# Simulate weekly advertising spend
+set.seed(42)
+ad_spend <- c(100, 0, 0, 0, 200, 0, 0, 50, 0, 0, 0, 0)
+
+# No decay (rate = 0): same as original
+adstock(ad_spend, rate = 0)
+
+# Light decay (rate = 0.3)
+adstock(ad_spend, rate = 0.3)
+
+# Heavy decay (rate = 0.7)
+adstock(ad_spend, rate = 0.7)
+```
+
+### Visualising Adstock Effect
+
+```{r adstock-visual}
+# Compare different decay rates
+rates <- c(0, 0.3, 0.5, 0.7)
+results <- sapply(rates, function(r) adstock(ad_spend, rate = r))
+colnames(results) <- paste0("rate_", rates)
+
+# Plot
+matplot(results, type = "l", lty = 1, lwd = 2,
+        col = c("black", "blue", "orange", "red"),
+        xlab = "Week", ylab = "Adstock Value",
+        main = "Adstock Transformation at Different Decay Rates")
+legend("topright", legend = paste("λ =", rates), 
+       col = c("black", "blue", "orange", "red"), lty = 1, lwd = 2)
+```
+
+**Interpretation**:
+
+- Black (rate=0): No carryover, values are unchanged
+- Blue (rate=0.3): Light carryover, effects decay quickly
+- Red (rate=0.7): Heavy carryover, effects persist for many periods
+
+### Reversing Adstock
+
+If you have adstocked data and need to recover the original values:
+
+```{r reverse-adstock}
+original <- c(100, 200, 300, 150, 200)
+
+# Apply adstock
+adstocked <- adstock(original, rate = 0.4)
+adstocked
+
+# Reverse to get original back
+recovered <- reverse_adstock(adstocked, rate = 0.4)
+recovered
+
+# Verify
+all.equal(original, recovered)
+```
+
+### Practical Example: Marketing Mix Modeling
+
+```{r mmm-example}
+# Simulate marketing data
+set.seed(123)
+n_weeks <- 52
+
+marketing_data <- data.frame(
+  week = 1:n_weeks,
+  tv_spend = rpois(n_weeks, lambda = 50) * rbinom(n_weeks, 1, 0.3),
+  digital_spend = rpois(n_weeks, lambda = 30),
+  sales = 1000 + rnorm(n_weeks, sd = 50)
+)
+
+# Apply adstock with different rates for different channels
+# TV has longer carryover than digital
+marketing_data$tv_adstock <- adstock(marketing_data$tv_spend, rate = 0.6)
+marketing_data$digital_adstock <- adstock(marketing_data$digital_spend, rate = 0.3)
+
+head(marketing_data)
+
+# Now these adstocked variables can be used in regression
+# model <- lm(sales ~ tv_adstock + digital_adstock, data = marketing_data)
+```
+
+## Time Series Utilities
+
+### Percentage Change
+
+Calculate period-over-period percentage change:
+
+```{r pc-change}
+prices <- c(100, 110, 105, 115, 120)
+
+# Default: 1-period change
+pc_change(prices)
+
+# 2-period change
+pc_change(prices, lag = 2)
+```
+
+This is useful for:
+
+- Calculating returns from prices
+- Normalising series with different scales
+- Growth rate analysis
+
+### Returning k-th Date
+
+Find specific dates in a vector:
+
+```{r return-k-date}
+library(lubridate)
+
+dates <- ymd(c("2024-01-15", "2024-03-20", "2024-02-10", "2024-04-05"))
+
+# Most recent date
+return_k_date(dates, k = 1)
+
+# 2nd most recent
+return_k_date(dates, k = 2)
+
+# 2nd oldest (decreasing = FALSE)
+return_k_date(dates, k = 2, decreasing = FALSE)
+```
+
+### Time Series Aggregation
+
+Aggregate time series data by time periods using dplyr operations:
+
+```{r ts-summarise}
+# Create daily data
+set.seed(789)
+daily_data <- data.frame(
+  Date = seq(as.Date("2024-01-01"), as.Date("2024-03-31"), by = "day"),
+  sales = rpois(91, lambda = 100),
+  visitors = rpois(91, lambda = 500)
+)
+
+head(daily_data)
+
+# Aggregate to monthly using base R
+library(dplyr)
+monthly <- daily_data %>%
+  mutate(month = format(Date, "%Y-%m")) %>%
+  group_by(month) %>%
+  summarise(
+    sales = sum(sales),
+    visitors = sum(visitors)
+  )
+monthly
+
+# Aggregate to weekly 
+weekly <- daily_data %>%
+  mutate(week = lubridate::floor_date(Date, "week")) %>%
+  group_by(week) %>%
+  summarise(
+    sales = mean(sales),
+    visitors = mean(visitors)
+  )
+head(weekly)
+```
+
+### Start-End Line
+
+Generate a linear sequence between the first and last values:
+
+```{r stend-line}
+values <- c(100, 120, 90, 150, 200)
+
+# Linear interpolation from start to end
+stend_line(values)
+
+# Useful for calculating deviation from trend
+actual <- values
+trend <- stend_line(values)
+deviation <- actual - trend
+data.frame(actual, trend, deviation)
+```
+
+### Sum of Lagged Differences (Fluctuation Score)
+
+Measure how much a series fluctuates:
+
+```{r sumlagdiff}
+# Stable series
+stable <- c(100, 101, 99, 100, 102, 98)
+sumlagdiff(stable)
+
+# Volatile series
+volatile <- c(100, 150, 80, 200, 50, 180)
+sumlagdiff(volatile)
+```
+
+Higher values indicate more volatility/fluctuation. This can be used to:
+
+- Compare volatility across series
+- Identify regime changes
+- Flag unusual activity
+
+## Combining Tools
+
+### Example: Complete Marketing Analysis Pipeline
+
+```{r complete-example, fig.height=6}
+# Simulate weekly data
+set.seed(456)
+n <- 100
+
+df <- data.frame(
+  week = 1:n,
+  ad_spend = rpois(n, 50) * rbinom(n, 1, 0.4),
+  competitor_spend = rpois(n, 40) * rbinom(n, 1, 0.5)
+)
+
+# Apply adstock
+df$ad_adstock <- adstock(df$ad_spend, rate = 0.5)
+df$comp_adstock <- adstock(df$competitor_spend, rate = 0.5)
+
+# Simulate sales influenced by both
+df$sales <- 500 + 
+  0.5 * df$ad_adstock - 
+  0.3 * df$comp_adstock + 
+  rnorm(n, sd = 30)
+
+# 1. Basic co-movement between our ads and sales
+cat("=== Ad Spend vs Sales Co-movement ===\n")
+analyse_direction(df, ad_adstock, sales)
+
+# 2. Cross-correlation
+cat("\n")
+plot_xcf(df, ad_adstock, sales, title = "Ad Spend vs Sales Cross-Correlation")
+```
+
+```{r complete-example-2}
+# 3. Check for lead-lag
+cat("\n=== Lead-Lag Analysis ===\n")
+direction_leadlag(df$ad_adstock, df$sales, max_lag = 8)
+
+# 4. Rolling relationship
+plot_rolling_direction(
+  df$ad_adstock, df$sales,
+  window = 20,
+  title = "Rolling Ad-Sales Relationship"
+)
+```
+
+## Summary
+
+| Category | Function | Purpose |
+|----------|----------|---------|
+| **Cross-Correlation** | `xcf()` | Create cross-correlation table |
+| | `plot_xcf()` | Visualise cross-correlation |
+| **Adstock** | `adstock()` | Apply decay transformation |
+| | `reverse_adstock()` | Reverse decay transformation |
+| **Utilities** | `pc_change()` | Percentage change |
+| | `return_k_date()` | Get k-th date from vector |
+| | `ts_summarise()` | Aggregate by time period |
+| | `stend_line()` | Linear interpolation |
+| | `sumlagdiff()` | Fluctuation score |
+
+## See Also
+
+- Main vignette: "Introduction to Co-movement Analysis" for the core analytical functions
+- Function documentation: `?function_name` for detailed parameter descriptions

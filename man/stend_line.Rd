@@ -7,9 +7,17 @@
 stend_line(x)
 }
 \arguments{
-\item{x}{Numeric vector to pass through. Missing values other than the start and end value
-in the vector are ignored.}
+\item{x}{Numeric vector to pass through. Missing values other than the start
+and end value in the vector are ignored.}
+}
+\value{
+A numeric vector of the same length as `x` with values linearly
+  interpolated between the first and last values.
 }
 \description{
 Generates a linear vector between the start and end value of the input vector.
+}
+\examples{
+stend_line(c(10, NA, NA, NA, 50))
+
 }

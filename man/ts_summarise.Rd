@@ -7,16 +7,29 @@
 ts_summarise(x, grouping = "year", date_var = "Date", fun = "sum", ...)
 }
 \arguments{
-\item{x}{Data frame to be passed through}
+\item{x}{Data frame to be passed through.}
 
-\item{grouping}{Method of grouping / rounding used for dates. See `lubridate::floor_date()`}
+\item{grouping}{Method of grouping / rounding used for dates. See
+[lubridate::floor_date()] for valid values (e.g., "year", "month", "week").}
 
-\item{date_var}{Character string specifying variable name with the date variable}
+\item{date_var}{Character string specifying variable name with the date variable.}
 
-\item{fun}{Character string specifying function for summarising. Defaults to sum}
+\item{fun}{Character string specifying function for summarising. Defaults to "sum".}
 
-\item{...}{Additional arguments}
+\item{...}{Additional arguments passed to the summary function.}
+}
+\value{
+A summarised data frame grouped by the specified time interval.
 }
 \description{
-Group-summarise a time series
+Aggregates a time series data frame by a specified time grouping (e.g., year,
+month, week) using a summary function.
+}
+\examples{
+df <- data.frame(
+  Date = as.Date(c("2020-01-15", "2020-01-20", "2020-02-10", "2020-02-25")),
+  value = c(10, 20, 30, 40)
+)
+ts_summarise(df, grouping = "month", date_var = "Date")
+
 }

@@ -1,0 +1,79 @@
+url: https://martinctc.github.io/tstoolbox/
+template:
+  bootstrap: 5
+  bootswatch: cosmo
+
+home:
+  title: Tools for Time Series Co-movement Analysis
+  description: >
+    Comprehensive toolkit for analysing directional co-movement in time series,
+    with functions for statistical testing, lead-lag detection, and visualization.
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, news]
+    right: [search, github]
+  components:
+    articles:
+      text: Articles
+      menu:
+      - text: Introduction to Co-movement
+        href: articles/introduction-to-comovement.html
+      - text: Additional Tools
+        href: articles/additional-tools.html
+
+reference:
+- title: Co-movement Analysis
+  desc: >
+    Core functions for measuring directional co-movement between time series
+  contents:
+  - analyse_direction
+  - direction
+  - concordance
+
+- title: Temporal Analysis
+  desc: >
+    Functions for analysing how relationships change over time
+  contents:
+  - rolling_direction
+  - plot_rolling_direction
+  - direction_leadlag
+
+- title: Statistical Testing
+  desc: >
+    Hypothesis testing for co-movement significance and asymmetry
+  contents:
+  - direction_test
+  - asymmetric_direction
+
+- title: Cross-Correlation
+  desc: >
+    Traditional cross-correlation analysis and visualization
+  contents:
+  - xcf
+  - plot_xcf
+
+- title: Adstock Transformations
+  desc: >
+    Marketing mix modeling utilities for adstock effects
+  contents:
+  - adstock
+  - reverse_adstock
+
+- title: Time Series Utilities
+  desc: >
+    Helper functions for time series manipulation and diagnostics
+  contents:
+  - ts_summarise
+  - return_k_date
+  - pc_change
+  - stend_line
+  - sumlagdiff
+
+- title: internal
+  contents:
+  - pipe
+
+authors:
+  Martin Chan:
+    href: https://github.com/martinctc

@@ -9,8 +9,18 @@ adstock(x, rate = 0)
 \arguments{
 \item{x}{Numeric vector to be passed through.}
 
-\item{rate}{Decay rate to be applied to `x`}
+\item{rate}{Decay rate to be applied to `x`. Must be between 0 and 1.}
+}
+\value{
+A numeric vector of the same length as `x` with the adstock
+  transformation applied.
 }
 \description{
-Calculate adstock (decay)
+Applies an adstock (decay) transformation to a numeric vector using
+a recursive filter.
+}
+\examples{
+# Apply 20\% decay rate
+adstock(c(100, 200, 300, 150, 200), rate = 0.2)
+
 }

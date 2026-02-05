@@ -2,45 +2,151 @@
 
 [![R build status](https://github.com/martinctc/tstoolbox/workflows/R-CMD-check/badge.svg)](https://github.com/martinctc/tstoolbox/actions) [![CodeFactor](https://www.codefactor.io/repository/github/martinctc/tstoolbox/badge)](https://www.codefactor.io/repository/github/martinctc/tstoolbox)
 
-Useful tools for time series analysis
+Tools for time series co-movement analysis and diagnostics.
 
-This is a package built on functions that I've created in time-series analysis that I have produced in the past. Like many packages, not all of this would be 100% original work - some of them would be built upon the work of others, or are convenient wrappers around functions from other packages that perform more of the heavy-lifting work. I hope you would find this package useful!
+📖 **[View Full Documentation](https://martinctc.github.io/tstoolbox/)**
+
+## Overview
+
+**tstoolbox** provides a comprehensive toolkit for analysing how time series move together. The package focuses on **directional co-movement** — measuring when series rise and fall in sync — with functions for:
+
+- **Co-movement Analysis** — Measure how often two series move in the same direction
+- **Rolling Analysis** — Track how relationships change over time
+- **Lead-Lag Detection** — Identify which series leads or follows another
+- **Statistical Testing** — Test if co-movement is significant
+- **Asymmetry Detection** — Check if series co-move differently in upturns vs downturns
+
+These tools work as diagnostic/exploratory aids for time series modelling or as standalone analysis methods.
 
 ---
 
-This package includes functions for:
-* Direction Analysis - What is the proportion of data points where two time series move in the same direction?
-* Cross-correlation analysis - exploring lagged correlations
-* Calculating adstock (and "reverse" calculate the pre-transformed values using adstocked values)
+## Installation
 
-The functions in this package can work as supplementary tools to validate or support hypotheses which come out of time series modelling. They can also work as early diagnostic / exploratory tools pre-modelling.
+Install the development version from GitHub:
 
----
-
-### Installation
-
-surveytoolbox is not release on CRAN (yet). 
-You can install the latest development version from GitHub with:
-
-```
-install.packages("devtools")
+```r
+# install.packages("devtools")
 devtools::install_github("martinctc/tstoolbox")
 ```
----
-
-This package is currently still under development, so it does come with a health advice: if you do wish to use them - have a check and run through the examples before assimilating them into your analysis. 
 
 ---
-### Function Overview
 
-- `analyse_direction()` analyses co-movement between two numeric variables, returning a diagnostic explanation.
-- `return_k_date()` returns the _kth_ most recent or oldest date-time from a date-time vector.
-- `plot_xcf()` generates a cross-correlation plot as a 'pretty' ggplot object.
-(More to come!)
+## Quick Start
+
+```r
+library(tstoolbox)
+
+# Simulate two related time series
+set.seed(123)
+x <- cumsum(rnorm(100))
+y <- x + rnorm(100, sd = 0.5)
+
+# Basic co-movement analysis
+analyse_direction(data.frame(x, y), x, y)
+#> There are 72 out of 99 instance(s) (73%) where values move in the same direction.
+
+# Is this statistically significant?
+direction_test(x, y)
+#> Co-movement proportion: 0.7273
+#> p-value: 1.189e-05
+
+# How does co-movement change over time?
+plot_rolling_direction(x, y, window = 20)
+
+# Does one series lead the other?
+direction_leadlag(x, y, max_lag = 5)
+#> Contemporaneous relationship (no lead-lag) with 72.7% co-movement
+```
 
 ---
-### Contact me
+## Function Reference
+
+### Co-movement Analysis
+
+| Function | Description |
+|----------|-------------|
+| `analyse_direction()` | Analyse co-movement between two variables with diagnostic output |
+| `direction()` | Get direction of change ("Positive", "Negative", "Equal") for each observation |
+| `concordance()` | Calculate Harding-Pagan concordance index |
+
+### Temporal Analysis
+
+| Function | Description |
+|----------|-------------|
+| `rolling_direction()` | Calculate co-movement over rolling windows |
+| `plot_rolling_direction()` | Visualize rolling co-movement over time |
+| `direction_leadlag()` | Detect lead-lag relationships |
+
+### Statistical Testing
+
+| Function | Description |
+|----------|-------------|
+| `direction_test()` | Test significance of co-movement (binomial, permutation, bootstrap) |
+| `asymmetric_direction()` | Test if co-movement differs in upturns vs downturns |
+
+### Cross-Correlation
+
+| Function | Description |
+|----------|-------------|
+| `xcf()` | Create cross-correlation table |
+| `plot_xcf()` | Generate cross-correlation plot |
+
+### Adstock Transformations
+
+| Function | Description |
+|----------|-------------|
+| `adstock()` | Apply adstock (decay) transformation |
+| `reverse_adstock()` | Reverse adstock transformation |
+
+### Utilities
+
+| Function | Description |
+|----------|-------------|
+| `ts_summarise()` | Aggregate time series by time period |
+| `return_k_date()` | Get k-th most recent/oldest date |
+| `pc_change()` | Calculate percentage change |
+| `stend_line()` | Linear interpolation between start and end |
+| `sumlagdiff()` | Sum of absolute differences (fluctuation score) |
+
 ---
-Please feel free to submit suggestions and report bugs: <https://github.com/martinctc/tstoolbox/issues>
+
+## Examples
+
+### Detecting Lead-Lag Relationships
+
+```r
+# x leads y by 2 periods
+x <- cumsum(rnorm(100))
+y <- dplyr::lag(x, 2) + rnorm(100, sd = 0.3)
+
+result <- direction_leadlag(x, y, max_lag = 5)
+print(result)
+#> Optimal lag: -2
+#> Interpretation: x leads y by 2 period(s) with 85.6% co-movement
+
+plot(result)
+```
+
+### Asymmetric Co-movement
+
+```r
+# Do series co-move more during downturns?
+asymmetric_direction(x, y)
+#> During upturns: 71.2% (n = 52)
+#> During downturns: 78.3% (n = 46)
+#> Interpretation: Stronger co-movement during downturns
+```
+
+### Rolling Analysis with Dates
+```r
+dates <- seq(as.Date("2020-01-01"), by = "month", length.out = 100)
+plot_rolling_direction(x, y, window = 12, time = dates)
+```
+
+---
+
+## Contact
+
+Please submit suggestions and report bugs: <https://github.com/martinctc/tstoolbox/issues>
 
 Also check out my [website](https://martinctc.github.io) for my other work and packages.

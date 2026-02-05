@@ -2,13 +2,22 @@
 % Please edit documentation in R/direction.R
 \name{direction}
 \alias{direction}
-\title{For a numeric vector of values, return its relation to the previous (lagged) value}
+\title{Return the direction of change relative to the previous value}
 \usage{
 direction(x)
 }
 \arguments{
-\item{x}{Numeric vector to pass through}
+\item{x}{Numeric vector to pass through.}
+}
+\value{
+A character vector of the same length as `x`, with values
+  "Positive", "Negative", "Equal", or `NA`.
 }
 \description{
-For a numeric vector of values, return its relation to the previous (lagged) value
+For a numeric vector of values, return its relation to the previous
+(lagged) value as "Positive", "Negative", or "Equal".
+}
+\examples{
+direction(c(1, 3, 2, 5, 5))
+
 }

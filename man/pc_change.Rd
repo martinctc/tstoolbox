@@ -7,10 +7,20 @@
 pc_change(x, lag = 1)
 }
 \arguments{
-\item{x}{A vector to be passed through}
+\item{x}{A numeric vector to be passed through.}
 
-\item{lag}{The number of lags used, defaults to 1}
+\item{lag}{The number of lags used, defaults to 1.}
+}
+\value{
+A numeric vector of the same length as `x` containing the
+  percentage change relative to the lagged value. The first `lag`
+  elements will be `NA`.
 }
 \description{
 Calculate percentage change of a vector relative to a lag k
+}
+\examples{
+pc_change(c(100, 110, 121, 100))
+pc_change(c(100, 110, 121, 100), lag = 2)
+
 }
