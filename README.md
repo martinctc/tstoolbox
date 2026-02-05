@@ -4,6 +4,8 @@
 
 Tools for time series co-movement analysis and diagnostics.
 
+📖 **[View Full Documentation](https://martinctc.github.io/tstoolbox/)**
+
 ## Overview
 
 **tstoolbox** provides a comprehensive toolkit for analysing how time series move together. The package focuses on **directional co-movement** — measuring when series rise and fall in sync — with functions for:
